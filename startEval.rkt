@@ -1,5 +1,13 @@
 #lang racket
 
+;(define (startEval input)
+  ;(cond
+    ;[(number? input)] ; Check if input is a number
+    ;[()]
+    ;[(list? input)] ; Check if input is a list
+    ;[()]
+   ;))
+
 (define (startEval lst)
   (cond
     [(null? lst) '()]  ; Return an empty list if the input is empty.
