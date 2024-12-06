@@ -89,6 +89,47 @@
 
       [else (error "Unknown operator")]]))
 
+
+;;Let
+
+(if (eq? (car expr) 'let)
+    (let ([bindings (cadr expr)]
+          [body (caddr expr)]
+          [new-env env])
+      (for-each
+       (lambda (binding)
+         (set! new-env (cons (cons (car binding)
+                                   (startEval (cadr binding) env))
+                             new-env)))
+       bindings)
+      (startEval body new-env)))
+
+;; Letrec
+
+(if (eq? (car expr) 'letrec)
+    (let ([bindings (cadr expr)]
+          [body (caddr expr)]
+          [new-env env])
+      (for-each
+       (lambda (binding)
+         (set! new-env (cons (cons (car binding) #f) new-env)))
+       bindings)
+      (for-each
+       (lambda (binding)
+         (set-cdr! (assoc (car binding) new-env)
+                   (startEval (cadr binding) new-env)))
+       bindings)
+      (startEval body new-env)))
+
+;; Conditional
+
+(if (eq? (car expr) 'if)
+    (if (startEval (cadr expr) env)
+        (startEval (caddr expr) env)
+        (startEval (cadddr expr) env)))
+
+
+
 ;; Sample environment for testing
 (define env '((x . 5) (y . 10)))
 
@@ -114,7 +155,7 @@
 (displayln (startEval '(> 6 15) env)) ; Output: #f
 
 
-;; Chamod list code
+;; List 
 ;(define (startEval lst)
   ;(cond
     ;[(null? lst) '()]  ; Return an empty list if the input is empty.
